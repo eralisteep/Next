@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { Button, Form, Row } from "react-bootstrap";
 import { db } from "../firebase.config"; // Путь к файлу с настройками 
 import { collection, query, onSnapshot } from "firebase/firestore"; // Импортируем необходимые методы из Firestore
-import createUser from "../add_user"; // Assuming createUser is a function to add new users
-import deleteUser from "../delete_user"// Assuming deleteUser is a function to delete users
-import updateUser from "../update_user.js"; // Assuming updateUser is a function to update users
+import createUser from "../controllers/add_user"; // Assuming createUser is a function to add new users
+import deleteUser from "../controllers/delete_user"// Assuming deleteUser is a function to delete users
+import updateUser from "../controllers/update_user.js"; // Assuming updateUser is a function to update users
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -35,19 +35,15 @@ export default function Home() {
 
   // Обработчик отправки формы
   const handleSubmit = () => {
-    if (name && age && last) {
-      if (editUserId) {
-        updateUser(editUserId, { name, age, last }); // Обновляем данные пользователя
-        setEditUserId(null);
-      } else {
-        createUser(name, age, last); // Добавляем нового пользователя
-      }
-      setName(""); // Очищаем поля формы после отправки
-      setAge("");
-      setLast("");
+    if (editUserId) {
+      updateUser(editUserId, { name, age, last }); // Обновляем данные пользователя
+      setEditUserId(null);
     } else {
-      alert("Please fill in all fields.");
+      createUser(name, age, last); // Добавляем нового пользователя
     }
+    setName(""); // Очищаем поля формы после отправки
+    setAge("");
+    setLast("");
   };
 
   // Обработчик редактирования пользователя
@@ -60,21 +56,6 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Users List</h1>
-      {users.length > 0 ? (
-        users.map((user, index) => (
-          <Row key={index}>
-            <h2>{user.name}</h2>
-            <h3>{user.age}</h3>
-            <h3>{user.last}</h3>
-            <button onClick={() => deleteUser(user.id)}>Delete</button>
-            <button onClick={() => handleEdit(user)}>Edit</button>
-          </Row>
-        ))
-      ) : (
-        <p>Loading</p>
-      )}
-
       <Form>
         <Form.Group>
           <Form.Control
@@ -86,7 +67,7 @@ export default function Home() {
         </Form.Group>
         <Form.Group>
           <Form.Control
-            type="number"
+            type="text"
             value={age}
             onChange={(e) => setAge(e.target.value)}
             placeholder="Age"
@@ -102,6 +83,20 @@ export default function Home() {
         </Form.Group>
         <Button onClick={handleSubmit}>Submit</Button>
       </Form>
+      <h1>Users List</h1>
+      {users.length > 0 ? (
+        users.map((user, index) => (
+          <Row key={index}>
+            <h2>{user.name}</h2>
+            <h2>{user.age}</h2>
+            <h2>{user.last}</h2>
+            <button onClick={() => deleteUser(user.id)}>Delete</button>
+            <button onClick={() => handleEdit(user)}>Edit</button>
+          </Row>
+        ))
+      ) : (
+        <p>Loading</p>
+      )}
     </div>
   );
 }

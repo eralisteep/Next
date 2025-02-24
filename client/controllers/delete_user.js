@@ -1,5 +1,5 @@
 import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "./firebase.config"; // Импортируйте ваш объект db
+import { db } from "../firebase.config"; // Импортируйте ваш объект db
 
 async function deleteUser(userId) {
   if (!userId) {

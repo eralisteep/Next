@@ -1,5 +1,5 @@
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "./firebase.config"; // Импортируйте ваш объект db
+import { db } from "../firebase.config"; // Импортируйте ваш объект db
 
 async function updateUser(userId, updatedData) {
   if (!userId || !updatedData) {
