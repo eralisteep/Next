@@ -1,12 +1,12 @@
-"use client"; // Make sure to add this to mark the file as a client-side component
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button, Form, Row } from "react-bootstrap";
-import { db } from "../firebase.config"; // Путь к файлу с настройками 
-import { collection, query, onSnapshot } from "firebase/firestore"; // Импортируем необходимые методы из Firestore
-import createUser from "../controllers/add_user"; // Assuming createUser is a function to add new users
-import deleteUser from "../controllers/delete_user"// Assuming deleteUser is a function to delete users
-import updateUser from "../controllers/update_user.js"; // Assuming updateUser is a function to update users
+import { db } from "../firebase.config";
+import { collection, query, onSnapshot } from "firebase/firestore";
+import createUser from "../controllers/add_user";
+import deleteUser from "../controllers/delete_user";
+import updateUser from "../controllers/update_user.js";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -14,39 +14,101 @@ export default function Home() {
   const [age, setAge] = useState("");
   const [last, setLast] = useState("");
   const [editUserId, setEditUserId] = useState(null);
+  const [isAimEnabled, setIsAimEnabled] = useState(false); // Переключатель прицела
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Переключатель звука
 
-  // Слушаем изменения в Firestore (реальное время)
+  // Загружаем состояние прицела и звука из localStorage
   useEffect(() => {
-    const usersCollection = collection(db, "users"); // Путь к коллекции "users" в Firestore
+    const savedAimState = localStorage.getItem("aimEnabled") === "true";
+    const savedSoundState = localStorage.getItem("soundEnabled") === "true";
+    setIsAimEnabled(savedAimState);
+    setIsSoundEnabled(savedSoundState);
+  }, []);
+
+  useEffect(() => {
+    const usersCollection = collection(db, "users");
     const q = query(usersCollection);
 
-    // onSnapshot — это метод, который будет автоматически обновлять данные
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const usersData = [];
       querySnapshot.forEach((doc) => {
-        usersData.push({ id: doc.id, ...doc.data() }); // Получаем данные каждого пользователя с id
+        usersData.push({ id: doc.id, ...doc.data() });
       });
-      setUsers(usersData); // Обновляем состояние с новым списком пользователей
+      setUsers(usersData);
     });
 
-    // Функция очистки подписки при размонтировании компонента
     return () => unsubscribe();
   }, []);
 
-  // Обработчик отправки формы
+  useEffect(() => {
+    if (!isAimEnabled) return; // Если прицел выключен, не включаем его логику
+
+    const cursor = document.querySelector(".cursor");
+    const shootSound = new Audio("/1323308625854201938.ogg");
+
+    if (!cursor) {
+      console.error("❌ Ошибка: .cursor не найден!");
+      return;
+    }
+
+    // Двигаем прицел за курсором
+    const moveCursor = (e) => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    };
+
+    // Выстрел при клике
+    const shoot = () => {
+      cursor.classList.add("shooting");
+
+      if (isSoundEnabled) {
+        shootSound.currentTime = 0;
+        shootSound.play().catch((error) => console.error("Ошибка воспроизведения:", error));
+      }
+
+      setTimeout(() => {
+        cursor.classList.remove("shooting");
+      }, 150);
+    };
+
+    document.addEventListener("mousemove", moveCursor);
+    document.addEventListener("click", shoot);
+
+    return () => {
+      document.removeEventListener("mousemove", moveCursor);
+      document.removeEventListener("click", shoot);
+    };
+  }, [isAimEnabled, isSoundEnabled]);
+
+  // Функция для переключения прицела
+  const toggleAim = () => {
+    setIsAimEnabled((prev) => {
+      const newState = !prev;
+      localStorage.setItem("aimEnabled", newState);
+      return newState;
+    });
+  };
+
+  // Функция для переключения звука
+  const toggleSound = () => {
+    setIsSoundEnabled((prev) => {
+      const newState = !prev;
+      localStorage.setItem("soundEnabled", newState);
+      return newState;
+    });
+  };
+
   const handleSubmit = () => {
     if (editUserId) {
-      updateUser(editUserId, { name, age, last }); // Обновляем данные пользователя
+      updateUser(editUserId, { name, age, last });
       setEditUserId(null);
     } else {
-      createUser(name, age, last); // Добавляем нового пользователя
+      createUser(name, age, last);
     }
-    setName(""); // Очищаем поля формы после отправки
+    setName("");
     setAge("");
     setLast("");
   };
 
-  // Обработчик редактирования пользователя
   const handleEdit = (user) => {
     setName(user.name);
     setAge(user.age);
@@ -56,33 +118,30 @@ export default function Home() {
 
   return (
     <div>
+      {/* Только если прицел включен, добавляем кастомный курсор */}
+      {isAimEnabled && <img src="/image.png" className="cursor" />}
+
+      {/* Кнопки управления */}
+      <div style={{ marginBottom: "20px" }}>
+        <Button onClick={toggleAim}>{isAimEnabled ? "Выключить прицел" : "Включить прицел"}</Button>
+        <Button onClick={toggleSound} style={{ marginLeft: "10px" }}>
+          {isSoundEnabled ? "Выключить звук" : "Включить звук"}
+        </Button>
+      </div>
+
       <Form>
         <Form.Group>
-          <Form.Control
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-          />
+          <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
         </Form.Group>
         <Form.Group>
-          <Form.Control
-            type="text"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            placeholder="Age"
-          />
+          <Form.Control type="text" value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" />
         </Form.Group>
         <Form.Group>
-          <Form.Control
-            type="text"
-            value={last}
-            onChange={(e) => setLast(e.target.value)}
-            placeholder="Last"
-          />
+          <Form.Control type="text" value={last} onChange={(e) => setLast(e.target.value)} placeholder="Last" />
         </Form.Group>
         <Button onClick={handleSubmit}>Submit</Button>
       </Form>
+
       <h1>Users List</h1>
       {users.length > 0 ? (
         users.map((user, index) => (

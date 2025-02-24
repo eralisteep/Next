@@ -62,7 +62,6 @@ button {
   height: 48px;
   width: 96px;
   border: none;
-  cursor: pointer;
   font-size: 16px;
   color: white;
   background-color: black;
@@ -95,4 +94,21 @@ button:hover {
 @keyframes spin3D {
   0% { transform: rotate3d(1, 1, 1, 0deg) scaleZ(1); }
   100% { transform: rotate3d(1, 1, 1, 360deg) scaleZ(1.5); }
+}
+
+.cursor {
+  width: 32px;
+  position: fixed;
+  left: -16px;
+  top: -8,719px;
+  pointer-events: none;
+  z-index: 69;
+  transition: transform 0.1s ease-out;
+  cursor: none; /* Убираем стандартный курсор */
+}
+
+/* Эффект увеличения при наведении на кнопку */
+button:hover ~ .cursor {
+  transform: scale(2);
+  background-color: rgba(255, 255, 255, 0.9);
 }
