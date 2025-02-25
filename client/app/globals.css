@@ -1,29 +1,89 @@
-body.light html.dark{
+html.dark {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-body.dark html.light{
+html.light {
   --foreground: #ffffff;
   --background: #171717;
 }
 
-html.light svg{
+html.light .spin {
+  background-color: gray;
+}
+
+html.dark .spin {
+  background-color: gray;
+}
+
+html.light svg {
   background-color: rgb(200, 202, 202);
   color: rgb(97, 89, 89);
 }
 
-html.dark svg{
+html.dark svg {
   background-color: rgb(56, 54, 54);
   color: white;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
+.spin {
+  animation: spin3D 20s infinite;
+  transform-style: preserve-3d; /* Добавлено для 3D-эффекта */
+}
+
+.container {
+  perspective: 500px; /* Глубина 3D-эффекта */
+}
+
+svg {
+  padding: 10px;
+  border-radius: 8000px;
+  height: 64px;
+  width: 64px;
+  border: none;
+  font-size: 16px;
+  color: white;
+  background-color: grey;
+  transition: all 0.3s ease-in-out;
+  transform-origin: center;
+  transform-style: preserve-3d; /* Добавлено для 3D-эффекта */
+  margin-right: 5%;
+}
+
+/* Эффект при наведении */
+svg:hover {
+  color: black;
+  background-color: white;
+  scale: 1.1;
+  animation: spin infinite 1s linear;
+}
+
+/* 3D-анимация */
+@keyframes spin3D {
+  0% { transform: rotate3d(1, 1, 1, 0deg) scaleZ(1); }
+  100% { transform: rotate3d(1, 1, 1, 360deg) scaleZ(1.5); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cursor {
+  width: 32px;
+  position: fixed;
+  left: -16px;
+  top: -8,719px;
+  pointer-events: none;
+  z-index: 69;
+  transition: transform 0.1s ease-out;
+  cursor: none;
+}
+
+svg:hover ~ .cursor {
+  transform: scale(2);
+  background-color: rgba(255, 255, 255, 0.9);
+}
 
 html,
 body {
@@ -54,67 +114,11 @@ a {
   }
 }
 
-
-input{
+input {
   height: 48px;
   width: 100%;
   text-align: center;
   justify-content: center;
   margin-bottom: 20px;
-  
-}
-
-.container {
-  perspective: 500px; /* Глубина 3D-эффекта */
-}
-
-svg {
-  padding: 10px;
-  border-radius: 8000px;
-  height: 64px;
-  width: 64px;
-  border: none;
-  font-size: 16px;
-  color: white;
-  background-color: grey;
-  transition: all 0.3s ease-in-out;
-  transform-origin: center;
-  transform-style: preserve-3d;
-  margin-right: 5%;
-}
-
-
-/* Эффект при наведении */
-svg:hover {
-  color: black;
-  background-color: white;
-  scale: 1.1;
-  animation: spin infinite 1s linear;
-}
-
-/* 3D-анимация */
-@keyframes spin3D {
-  0% { transform: rotate3d(1, 1, 1, 0deg) scaleZ(1); }
-  100% { transform: rotate3d(1, 1, 1, 360deg) scaleZ(1.5); }
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.cursor {
-  width: 32px;
-  position: fixed;
-  left: -16px;
-  top: -8,719px;
-  pointer-events: none;
-  z-index: 69;
-  transition: transform 0.1s ease-out;
-  cursor: none;
-}
-
-svg:hover ~ .cursor {
-  transform: scale(2);
-  background-color: rgba(255, 255, 255, 0.9);
 }
 

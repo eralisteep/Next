@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button, Form, Row } from "react-bootstrap";
-import { Anvil, Moon, Pen, Plus, Sun, Trash2, Volume2, VolumeX, X } from "lucide-react";
+import { Form, Row } from "react-bootstrap";
+import { Anvil, Pencil, Plus, Rotate3D, Spline, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { db } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import createUser from "../controllers/add_user";
@@ -19,6 +19,7 @@ export default function Home() {
   const [editUserId, setEditUserId] = useState(null);
   const [isAimEnabled, setIsAimEnabled] = useState(false); // Переключатель прицела
   const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Переключатель звука
+  const [animation, setAnimation] = useState("");
   const { theme, setTheme } = useTheme();
 
   // Загружаем состояние прицела и звука из localStorage
@@ -118,6 +119,12 @@ export default function Home() {
     setLast("");
   };
 
+  const handleAnimation = () => {
+    if (animation === "") {
+      setAnimation("spin");
+    } else {
+      setAnimation("");}
+  }
   const handleEdit = (user) => {
     setName(user.name);
     setAge(user.age);
@@ -133,9 +140,12 @@ export default function Home() {
   };
 
   return (
-    <div className="dark:bg-black dark:text-white p-4">
+    <div className={animation}>
       {isAimEnabled && <img src="/image.png" className="cursor" />}
       <ThemeToggle/>
+      <Rotate3D onClick={handleAnimation} style={{ marginLeft: "10px" }}>
+        Анимация
+      </Rotate3D>
       <div style={{ marginBottom: "20px" }}>
         <Anvil onClick={toggleAim}>
           {isAimEnabled ? "Выключить прицел" : "Включить прицел"}
@@ -188,7 +198,7 @@ export default function Home() {
             <h2>{user.age}</h2>
             <h2>{user.last}</h2>
             <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
-            <Pen onClick={() => handleEdit(user)}>Edit</Pen>
+            <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
           </Row>
         ))
       ) : (
