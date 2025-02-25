@@ -116,12 +116,17 @@ export default function Home() {
     setEditUserId(user.id);
   };
 
+  const handleCancel = () => {
+    setName("");
+    setAge("");
+    setLast("");
+    setEditUserId(null);
+  };
+
   return (
     <div>
-      {/* Только если прицел включен, добавляем кастомный курсор */}
       {isAimEnabled && <img src="/image.png" className="cursor" />}
 
-      {/* Кнопки управления */}
       <div style={{ marginBottom: "20px" }}>
         <Button onClick={toggleAim}>{isAimEnabled ? "Выключить прицел" : "Включить прицел"}</Button>
         <Button onClick={toggleSound} style={{ marginLeft: "10px" }}>
@@ -140,6 +145,7 @@ export default function Home() {
           <Form.Control type="text" value={last} onChange={(e) => setLast(e.target.value)} placeholder="Last" />
         </Form.Group>
         <Button onClick={handleSubmit}>Submit</Button>
+        {editUserId && <Button onClick={handleCancel}>Cancel editing</Button>}
       </Form>
 
       <h1>Users List</h1>
