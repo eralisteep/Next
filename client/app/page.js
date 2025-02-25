@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Button, Form, Row } from "react-bootstrap";
+import { Anvil, Moon, Pen, Plus, Sun, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { db } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import createUser from "../controllers/add_user";
 import deleteUser from "../controllers/delete_user";
 import updateUser from "../controllers/update_user.js";
+import { useTheme } from "next-themes";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -16,6 +19,7 @@ export default function Home() {
   const [editUserId, setEditUserId] = useState(null);
   const [isAimEnabled, setIsAimEnabled] = useState(false); // Переключатель прицела
   const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Переключатель звука
+  const { theme, setTheme } = useTheme();
 
   // Загружаем состояние прицела и звука из localStorage
   useEffect(() => {
@@ -97,6 +101,11 @@ export default function Home() {
     });
   };
 
+  // Функция для переключения темы
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   const handleSubmit = () => {
     if (editUserId) {
       updateUser(editUserId, { name, age, last });
@@ -124,28 +133,51 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="dark:bg-black dark:text-white p-4">
       {isAimEnabled && <img src="/image.png" className="cursor" />}
-
+      <ThemeToggle/>
       <div style={{ marginBottom: "20px" }}>
-        <Button onClick={toggleAim}>{isAimEnabled ? "Выключить прицел" : "Включить прицел"}</Button>
-        <Button onClick={toggleSound} style={{ marginLeft: "10px" }}>
-          {isSoundEnabled ? "Выключить звук" : "Включить звук"}
-        </Button>
+        <Anvil onClick={toggleAim}>
+          {isAimEnabled ? "Выключить прицел" : "Включить прицел"}
+        </Anvil>
+        {isSoundEnabled ? (
+          <Volume2 onClick={toggleSound} style={{ marginLeft: "10px" }}>
+            Выключить звук
+          </Volume2>
+        ) : (
+          <VolumeX onClick={toggleSound} style={{ marginLeft: "10px" }}>
+            Включить звук
+          </VolumeX>
+        )}
       </div>
 
       <Form>
         <Form.Group>
-          <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+          <Form.Control
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
         </Form.Group>
         <Form.Group>
-          <Form.Control type="text" value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" />
+          <Form.Control
+            type="text"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            placeholder="Age"
+          />
         </Form.Group>
         <Form.Group>
-          <Form.Control type="text" value={last} onChange={(e) => setLast(e.target.value)} placeholder="Last" />
+          <Form.Control
+            type="text"
+            value={last}
+            onChange={(e) => setLast(e.target.value)}
+            placeholder="Last"
+          />
         </Form.Group>
-        <Button onClick={handleSubmit}>Submit</Button>
-        {editUserId && <Button onClick={handleCancel}>Cancel editing</Button>}
+        <Plus onClick={handleSubmit}>Submit</Plus>
+        {editUserId && <X onClick={handleCancel}>Cancel editing</X>}
       </Form>
 
       <h1>Users List</h1>
@@ -155,8 +187,8 @@ export default function Home() {
             <h2>{user.name}</h2>
             <h2>{user.age}</h2>
             <h2>{user.last}</h2>
-            <button onClick={() => deleteUser(user.id)}>Delete</button>
-            <button onClick={() => handleEdit(user)}>Edit</button>
+            <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
+            <Pen onClick={() => handleEdit(user)}>Edit</Pen>
           </Row>
         ))
       ) : (
