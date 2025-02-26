@@ -9,7 +9,7 @@ async function deleteUser(userId) {
 
   try {
     // Создайте ссылку на документ пользователя
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, "informations", userId);
 
     // Удалите документ
     await deleteDoc(userDocRef);

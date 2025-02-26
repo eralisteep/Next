@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Form, Row } from "react-bootstrap";
-import { Anvil, Gift, Pencil, Plus, Rotate3D, Spline, Trash2, Volume2, VolumeX, X } from "lucide-react";
+import { Anvil, Check, Gift, Pencil, Plus, Rotate3D, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { db, auth } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import createUser from "../controllers/add_user";
@@ -14,20 +14,20 @@ import Register from "@/components/Register";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
 import { onAuthStateChanged } from "firebase/auth";
+import { checkUserRole } from "@/components/CheckRole";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState(null);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [last, setLast] = useState("");
   const [editUserId, setEditUserId] = useState(null);
-  const [isAimEnabled, setIsAimEnabled] = useState(false); // Переключатель прицела
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Переключатель звука
+  const [isAimEnabled, setIsAimEnabled] = useState(false); 
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false); 
   const [animation, setAnimation] = useState("");
   const { theme, setTheme } = useTheme();
-  const [user, setUser] = useState(null);
 
-  // Загружаем состояние прицела и звука из localStorage
   useEffect(() => {
     const savedAimState = localStorage.getItem("aimEnabled") === "true";
     const savedSoundState = localStorage.getItem("soundEnabled") === "true";
@@ -36,7 +36,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const usersCollection = collection(db, "users");
+    const usersCollection = collection(db, "informations");
     const q = query(usersCollection);
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -51,7 +51,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isAimEnabled) return; // Если прицел выключен, не включаем его логику
+    if (!isAimEnabled) return; 
 
     const cursor = document.querySelector(".cursor");
     const shootSound = new Audio("/1323308625854201938.ogg");
@@ -61,12 +61,12 @@ export default function Home() {
       return;
     }
 
-    // Двигаем прицел за курсором
+    
     const moveCursor = (e) => {
       cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
     };
 
-    // Выстрел при клике
+    
     const shoot = () => {
       cursor.classList.add("shooting");
 
@@ -97,7 +97,7 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  // Функция для переключения прицела
+  
   const toggleAim = () => {
     setIsAimEnabled((prev) => {
       const newState = !prev;
@@ -106,18 +106,13 @@ export default function Home() {
     });
   };
 
-  // Функция для переключения звука
+  
   const toggleSound = () => {
     setIsSoundEnabled((prev) => {
       const newState = !prev;
       localStorage.setItem("soundEnabled", newState);
       return newState;
     });
-  };
-
-  // Функция для переключения темы
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const handleSubmit = () => {

@@ -9,7 +9,7 @@ async function updateUser(userId, updatedData) {
 
   try {
     // Создайте ссылку на документ пользователя
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, "informations", userId);
 
     // Обновите документ
     await updateDoc(userDocRef, updatedData);

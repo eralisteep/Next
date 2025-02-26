@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { LogIn } from "lucide-react";
+import { Row } from "react-bootstrap";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,7 +11,6 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("User logged in successfully!");
     } catch (error) {
       console.error("Error logging in user: ", error);
       alert(error.message);
@@ -18,7 +18,7 @@ export default function Login() {
   };
 
   return (
-    <div>
+    <Row>
       <h2>Login</h2>
       <input
         type="email"
@@ -33,6 +33,6 @@ export default function Login() {
         placeholder="Password"
       />
       <LogIn onClick={handleLogin}>Login</LogIn>
-    </div>
+    </Row>
   );
 }
