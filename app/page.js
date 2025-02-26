@@ -201,7 +201,7 @@ export default function Home() {
             {editUserId && <X onClick={handleCancel}>Cancel editing</X>}
           </Form>
 
-          <h1>Users List</h1>
+          <h1>informations</h1>
           {users.length > 0 ? (
             users.map((user, index) => (
               <Row key={index}>
