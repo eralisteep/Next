@@ -43,8 +43,9 @@ html.dark svg {
   transform-style: preserve-3d; 
 }
 
-.container {
-  perspective: 500px;
+.row{
+  border: 1px gray solid;
+  border-radius: 10px;
 }
 
 svg {

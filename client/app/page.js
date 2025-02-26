@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react";
 import { Form, Row } from "react-bootstrap";
 import { Anvil, Gift, Pencil, Plus, Rotate3D, Spline, Trash2, Volume2, VolumeX, X } from "lucide-react";
-import { db } from "../firebase.config";
+import { db, auth } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import createUser from "../controllers/add_user";
 import deleteUser from "../controllers/delete_user";
 import updateUser from "../controllers/update_user.js";
 import { useTheme } from "next-themes";
 import ThemeToggle from "@/components/ThemeToggle";
-import { redirect } from "react-router-dom";
+import Register from "@/components/Register";
+import Login from "@/components/Login";
+import Logout from "@/components/Logout";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -22,6 +25,7 @@ export default function Home() {
   const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Переключатель звука
   const [animation, setAnimation] = useState("");
   const { theme, setTheme } = useTheme();
+  const [user, setUser] = useState(null);
 
   // Загружаем состояние прицела и звука из localStorage
   useEffect(() => {
@@ -84,6 +88,14 @@ export default function Home() {
       document.removeEventListener("click", shoot);
     };
   }, [isAimEnabled, isSoundEnabled]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Функция для переключения прицела
   const toggleAim = () => {
@@ -162,48 +174,58 @@ export default function Home() {
         )}
       </div>
 
-      <Form>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            placeholder="Age"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            value={last}
-            onChange={(e) => setLast(e.target.value)}
-            placeholder="Last"
-          />
-        </Form.Group>
-        <Plus onClick={handleSubmit}>Submit</Plus>
-        {editUserId && <X onClick={handleCancel}>Cancel editing</X>}
-      </Form>
+      {user ? (
+        <>
+          <Logout />
+          <Form>
+            <Form.Group>
+              <Form.Control
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                type="text"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="Age"
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                type="text"
+                value={last}
+                onChange={(e) => setLast(e.target.value)}
+                placeholder="Last"
+              />
+            </Form.Group>
+            <Plus onClick={handleSubmit}>Submit</Plus>
+            {editUserId && <X onClick={handleCancel}>Cancel editing</X>}
+          </Form>
 
-      <h1>Users List</h1>
-      {users.length > 0 ? (
-        users.map((user, index) => (
-          <Row key={index}>
-            <h2>{user.name}</h2>
-            <h2>{user.age}</h2>
-            <h2>{user.last}</h2>
-            <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
-            <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
-          </Row>
-        ))
+          <h1>Users List</h1>
+          {users.length > 0 ? (
+            users.map((user, index) => (
+              <Row key={index}>
+                <h2>{user.name}</h2>
+                <h2>{user.age}</h2>
+                <h2>{user.last}</h2>
+                <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
+                <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
+              </Row>
+            ))
+          ) : (
+            <p>Loading</p>
+          )}
+        </>
       ) : (
-        <p>Loading</p>
+        <>
+          <Register />
+          <Login />
+        </>
       )}
       <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
         <Gift></Gift>
