@@ -1,19 +1,31 @@
-html.dark {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  transition: background-color 2s ease, color 2s ease;
 }
 
-html.light {
+html.dark {
   --foreground: #ffffff;
   --background: #171717;
 }
 
-html.light .spin {
-  background-color: gray;
+html.light {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+html.light .spin, 
 html.dark .spin {
   background-color: gray;
+  transition: background-color 0.5s ease;
+}
+
+html.light svg,
+html.dark svg {
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 html.light svg {
@@ -28,11 +40,11 @@ html.dark svg {
 
 .spin {
   animation: spin3D 20s infinite;
-  transform-style: preserve-3d; /* Добавлено для 3D-эффекта */
+  transform-style: preserve-3d; 
 }
 
 .container {
-  perspective: 500px; /* Глубина 3D-эффекта */
+  perspective: 500px;
 }
 
 svg {
@@ -46,11 +58,10 @@ svg {
   background-color: grey;
   transition: all 0.3s ease-in-out;
   transform-origin: center;
-  transform-style: preserve-3d; /* Добавлено для 3D-эффекта */
+  transform-style: preserve-3d; 
   margin-right: 5%;
 }
 
-/* Эффект при наведении */
 svg:hover {
   color: black;
   background-color: white;

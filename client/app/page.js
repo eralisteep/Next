@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Form, Row } from "react-bootstrap";
-import { Anvil, Pencil, Plus, Rotate3D, Spline, Trash2, Volume2, VolumeX, X } from "lucide-react";
+import { Anvil, Gift, Pencil, Plus, Rotate3D, Spline, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { db } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import createUser from "../controllers/add_user";
@@ -10,6 +10,7 @@ import deleteUser from "../controllers/delete_user";
 import updateUser from "../controllers/update_user.js";
 import { useTheme } from "next-themes";
 import ThemeToggle from "@/components/ThemeToggle";
+import { redirect } from "react-router-dom";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -204,6 +205,9 @@ export default function Home() {
       ) : (
         <p>Loading</p>
       )}
+      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+        <Gift></Gift>
+      </a>
     </div>
   );
 }
