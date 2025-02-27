@@ -14,7 +14,8 @@ import Register from "@/components/Register";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
 import { onAuthStateChanged } from "firebase/auth";
-import { checkUserRole } from "@/components/CheckRole";
+import { checkRole } from "@/components/CheckRole";
+import { checkCreater } from "@/components/CheckCreater";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -27,6 +28,18 @@ export default function Home() {
   const [isSoundEnabled, setIsSoundEnabled] = useState(false); 
   const [animation, setAnimation] = useState("");
   const { theme, setTheme } = useTheme();
+  const [isCreater, setIsCreater] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [createrEmails, setCreaterEmails] = useState({});
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const adminStatus = await checkRole("admin");
+      setIsAdmin(adminStatus);
+    };
+
+    fetchRoles();
+  }, []);
 
   useEffect(() => {
     const savedAimState = localStorage.getItem("aimEnabled") === "true";
@@ -49,6 +62,20 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchCreators = async () => {
+      const newCreaterEmails = {};
+      for (const u of users) {
+        newCreaterEmails[u.id] = await checkCreater(u.creater);
+      }
+      setCreaterEmails(newCreaterEmails);
+    };
+
+    if (users.length > 0) {
+      fetchCreators();
+    }
+  }, [users]);
 
   useEffect(() => {
     if (!isAimEnabled) return; 
@@ -208,8 +235,12 @@ export default function Home() {
                 <h2>{user.name}</h2>
                 <h2>{user.age}</h2>
                 <h2>{user.last}</h2>
-                <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
-                <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
+                {isAdmin || createrEmails[user.id] ? (
+                  <>
+                    <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
+                    <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
+                  </>
+                ) : null}
               </Row>
             ))
           ) : (

@@ -4,7 +4,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 const auth = getAuth();
 const db = getFirestore();
 
-export const checkRole = (role) => {
+export const checkCreater = (email) => {
   return new Promise((resolve) => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -14,7 +14,8 @@ export const checkRole = (role) => {
       }
 
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      resolve(userDoc.exists() && userDoc.data().role === role);
+      const isCreater = userDoc.exists() && userDoc.data().email === email;
+      resolve(isCreater);
     });
   });
 };

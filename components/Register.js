@@ -6,7 +6,6 @@ import { UserPlus } from "lucide-react";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user"); // Роль по умолчанию
   const auth = getAuth();
   const db = getFirestore();
 
@@ -18,7 +17,7 @@ export default function Register() {
       // Добавляем пользователя в Firestore с ролью
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
-        role: role, // Сохранение роли в Firestore
+        role: "user", // Сохранение роли в Firestore
       });
 
       alert("User registered successfully with role!");
@@ -43,10 +42,6 @@ export default function Register() {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
       <UserPlus onClick={handleRegister} style={{ cursor: "pointer" }}>Register</UserPlus>
     </div>
   );

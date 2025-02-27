@@ -1,12 +1,15 @@
 // Add a second document with a generated ID.
 import { addDoc, collection } from "firebase/firestore"; 
-import { db } from "../firebase.config";
+import { auth, db } from "../firebase.config";
 
 function createUser(name, age, last) {
+  const currentUser = auth.currentUser
+  console.log(currentUser.email)
   const docRef = addDoc(collection(db, "informations"), {
     name: name,
     age: age,
-    last: last
+    last: last,
+    creater: currentUser.email
   });
   return {
     docRef
