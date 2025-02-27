@@ -9,7 +9,7 @@ html.light {
 }
 html.dark body{
   background-image: url('/void.png');
-  background-size: 100vh cover;
+  background-size: 100vw cover;
 }
 
 body {
