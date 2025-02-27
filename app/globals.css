@@ -1,7 +1,3 @@
-body {
-  transition: background-color 2s ease, color 2s ease;
-}
-
 html.dark {
   --foreground: #ffffff;
   --background: #171717;
@@ -11,10 +7,15 @@ html.light {
   --background: #ffffff;
   --foreground: #171717;
 }
+html.dark body{
+  background-image: url('/void.png');
+  background-size: 100vh cover;
+}
 
 body {
   background-color: var(--background);
   color: var(--foreground);
+  transition: background-color 2s ease, color 2s ease;
 }
 
 html.light .spin, 
@@ -37,10 +38,17 @@ html.dark svg {
   background-color: rgb(56, 54, 54);
   color: white;
 }
-
+.container{
+  z-index: 2;
+  background-color: #171717;
+}
+html.light .container{
+  background-color: #ffffff;
+}
 .spin {
   animation: spin3D 20s infinite;
   transform-style: preserve-3d; 
+  z-index: 2;
 }
 
 .row{

@@ -175,7 +175,7 @@ export default function Home() {
   };
 
   return (
-    <div className={animation}>
+    <div className={`container ${animation}`}>
       {isAimEnabled && <img src="/image.png" className="cursor" />}
       <ThemeToggle/>
       <Rotate3D onClick={handleAnimation} style={{ marginLeft: "10px" }}>
