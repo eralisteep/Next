@@ -199,7 +199,7 @@ export default function Home() {
       {user ? (
         <>
           <Logout />
-          <Form>
+          <Form id="form">
             <Form.Group>
               <Form.Control
                 type="text"
@@ -238,7 +238,9 @@ export default function Home() {
                 {isAdmin || createrEmails[user.id] ? (
                   <>
                     <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
-                    <Pencil onClick={() => handleEdit(user)}>Edit</Pencil>
+                    <a href="#form">
+                      <Pencil onClick={() => handleEdit(user)} />
+                    </a>
                   </>
                 ) : null}
               </Row>
