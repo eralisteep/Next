@@ -5,6 +5,7 @@ import { Form, Row } from "react-bootstrap";
 import { Anvil, Check, Gift, Pencil, Plus, Rotate3D, Trash2, Volume2, VolumeX, X } from "lucide-react";
 import { db, auth } from "../firebase.config";
 import { collection, query, onSnapshot } from "firebase/firestore";
+import axios from "axios";
 import createUser from "../controllers/add_user";
 import deleteUser from "../controllers/delete_user";
 import updateUser from "../controllers/update_user.js";
@@ -16,6 +17,10 @@ import Logout from "@/components/Logout";
 import { onAuthStateChanged } from "firebase/auth";
 import { checkRole } from "@/components/CheckRole";
 import { checkCreater } from "@/components/CheckCreater";
+import UploadFile from "@/components/UploadFile";
+
+const TELEGRAM_BOT_TOKEN = "7629632078:AAFwGMwD36V1-NyDvLoPhc9ZMrxr2LD96GI";
+const TELEGRAM_CHAT_ID = "-4706850495";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -23,6 +28,7 @@ export default function Home() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [last, setLast] = useState("");
+  const [file, setFile] = useState(null);
   const [editUserId, setEditUserId] = useState(null);
   const [isAimEnabled, setIsAimEnabled] = useState(false); 
   const [isSoundEnabled, setIsSoundEnabled] = useState(false); 
@@ -142,16 +148,41 @@ export default function Home() {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    let fileURL = "";
+    if (file) {
+      const formData = new FormData();
+      formData.append("chat_id", TELEGRAM_CHAT_ID);
+      formData.append("document", file);
+  
+      try {
+        const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        });
+        fileURL = response.data.result.document.file_id;
+      } catch (error) {
+        console.error("Ошибка загрузки файла в Telegram:", error);
+      }
+    }
+  
+    const userData = { name, age, last, fileURL };
+  
     if (editUserId) {
-      updateUser(editUserId, { name, age, last });
+      updateUser(editUserId, userData);
       setEditUserId(null);
     } else {
-      createUser(name, age, last);
+      try {
+        await createUser(name, age, last, fileURL);
+      } catch (error) {
+        console.error("Ошибка создания пользователя:", error);
+      }
     }
     setName("");
     setAge("");
     setLast("");
+    setFile(null);
   };
 
   const handleAnimation = () => {
@@ -224,6 +255,12 @@ export default function Home() {
                 placeholder="Last"
               />
             </Form.Group>
+            <Form.Group>
+              <Form.Control
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+            </Form.Group>
             <Plus onClick={handleSubmit}>Submit</Plus>
             {editUserId && <X onClick={handleCancel}>Cancel editing</X>}
           </Form>
@@ -235,6 +272,7 @@ export default function Home() {
                 <h2>{user.name}</h2>
                 <h2>{user.age}</h2>
                 <h2>{user.last}</h2>
+                {user.fileURL && <UploadFile fileId={user.fileURL} />}
                 {isAdmin || createrEmails[user.id] ? (
                   <>
                     <Trash2 onClick={() => deleteUser(user.id)}>Delete</Trash2>
